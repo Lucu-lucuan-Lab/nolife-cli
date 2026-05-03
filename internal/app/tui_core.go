@@ -313,8 +313,10 @@ func (m *downloadSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateEpisodeSelect(msg)
 	case setupQualitySelect:
 		return m.updateQualitySelect(msg)
+	case setupSearching, setupFetchingEpisodes, setupFetchingQualities, setupDownloading, setupDownloadDone, setupError, setupDone:
+		return m, nil
 	default:
-		panic("unhandled default case")
+		panic(fmt.Sprintf("unhandled state: %v", m.state))
 	}
 
 	return m, nil
@@ -414,8 +416,8 @@ func (m *downloadSetupModel) View() string {
 			b.WriteString(ui.ErrorStyle.Render(m.err.Error()))
 		}
 	default:
-		panic("unhandled default case")
+		panic(fmt.Sprintf("unhandled state: %v", m.state))
 	}
 
-	return lipgloss.Place(m.width, m.height, lipgloss.Left, lipgloss.Center, b.String())
+	return lipgloss.Place(m.width, m.height, lipgloss.Left, lipgloss.Top, b.String())
 }
