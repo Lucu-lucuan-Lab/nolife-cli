@@ -1,6 +1,5 @@
 $ErrorActionPreference = 'Stop'
 
-# Configuration
 $repo = "Lucu-lucuan-Lab/nolife-cli"
 $appName = "nolife"
 $installDir = Join-Path $env:LOCALAPPDATA "Programs\$appName"
@@ -63,26 +62,27 @@ function Assert-NotRunning {
 }
 
 function Add-ToPath($pathToAdd) {
-    $currentPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User)
-    $pathEntries = $currentPath -split ";" | Where-Object { $_ -ne "" }
+    $registryPath = "HKCU:\Environment"
+    $name = "Path"
     
-    # Clean up trailing slashes for comparison
-    $normalizedPath = $pathToAdd.TrimEnd('\')
+    $currentPathRaw = (Get-ItemProperty -Path $registryPath -Name $name -ErrorAction SilentlyContinue).Path
+    if ($null -eq $currentPathRaw) { $currentPathRaw = "" }
+    
+    $normalizedNew = $pathToAdd.TrimEnd('\', '/').Replace('/', '\')
+    $pathEntries = $currentPathRaw -split ";" | Where-Object { $_ -ne "" }
+    
     $alreadyExists = $false
-    
     foreach ($entry in $pathEntries) {
-        if ($entry.TrimEnd('\') -eq $normalizedPath) {
+        if ($entry.TrimEnd('\', '/').Replace('/', '\') -eq $normalizedNew) {
             $alreadyExists = $true
             break
         }
     }
     
     if (-not $alreadyExists) {
-        $newPath = $currentPath
-        if ($newPath -and -not $newPath.EndsWith(";")) { $newPath += ";" }
-        $newPath += $pathToAdd
-        [Environment]::SetEnvironmentVariable("Path", $newPath, [EnvironmentVariableTarget]::User)
-        Write-Success "Added $pathToAdd to User PATH."
+        $newPath = if ($currentPathRaw -and -not $currentPathRaw.EndsWith(";")) { "$currentPathRaw;$pathToAdd" } else { "$currentPathRaw$pathToAdd" }
+        Set-ItemProperty -Path $registryPath -Name $name -Value $newPath -Type ExpandString
+        Write-Success "Added $pathToAdd to User PATH (Registry preserved)."
     }
 }
 

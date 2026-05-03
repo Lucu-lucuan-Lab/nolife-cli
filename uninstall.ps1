@@ -24,15 +24,20 @@ function Assert-NotRunning {
 }
 
 function Remove-FromPath($pathToRemove) {
-    $currentPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User)
-    $pathEntries = $currentPath -split ";" | Where-Object { $_ -ne "" }
+    $registryPath = "HKCU:\Environment"
+    $name = "Path"
     
-    $normalizedPath = $pathToRemove.TrimEnd('\')
+    $currentPathRaw = (Get-ItemProperty -Path $registryPath -Name $name -ErrorAction SilentlyContinue).Path
+    if ($null -eq $currentPathRaw) { return }
+
+    $normalizedTarget = $pathToRemove.TrimEnd('\', '/').Replace('/', '\')
+    $pathEntries = $currentPathRaw -split ";" | Where-Object { $_ -ne "" }
+    
     $newEntries = @()
     $found = $false
     
     foreach ($entry in $pathEntries) {
-        if ($entry.TrimEnd('\') -eq $normalizedPath) {
+        if ($entry.TrimEnd('\', '/').Replace('/', '\') -eq $normalizedTarget) {
             $found = $true
         } else {
             $newEntries += $entry
@@ -41,7 +46,7 @@ function Remove-FromPath($pathToRemove) {
     
     if ($found) {
         $newPathString = $newEntries -join ";"
-        [Environment]::SetEnvironmentVariable("Path", $newPathString, [EnvironmentVariableTarget]::User)
+        Set-ItemProperty -Path $registryPath -Name $name -Value $newPathString -Type ExpandString
         Write-Success "Removed $pathToRemove from User PATH."
     }
 }

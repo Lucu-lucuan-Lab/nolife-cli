@@ -1,13 +1,11 @@
 #!/bin/bash
 set -e
 
-# Configuration
 REPO="Lucu-lucuan-Lab/nolife-cli"
 APP_NAME="nolife"
 GITHUB_URL="https://github.com/$REPO"
 API_URL="https://api.github.com/repos/$REPO/releases/latest"
 
-# Terminal Colors
 CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -18,6 +16,13 @@ write_step() { echo -e "\n${CYAN}[*] $1${NC}"; }
 write_success() { echo -e "${GREEN}[+] $1${NC}"; }
 write_warning() { echo -e "${YELLOW}[!] $1${NC}"; }
 write_error() { echo -e "${RED}[X] $1${NC}"; }
+
+assert_not_running() {
+    if pgrep -x "$APP_NAME" > /dev/null; then
+        write_error "$APP_NAME is currently running. Please close it before installing/updating."
+        exit 1
+    fi
+}
 
 # Detect OS and Architecture
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
@@ -37,15 +42,16 @@ esac
 write_step "Detecting system..."
 echo "OS: $OS, Arch: $ARCH"
 
+assert_not_running
+
 # Determine install directory
-if [ "$OS" == "darwin" ] || [ -w "/usr/local/bin" ]; then
+if [ "$OS" == "darwin" ]; then
     INSTALL_DIR="/usr/local/bin"
-    USE_SUDO=false
+elif [ -w "/usr/local/bin" ]; then
+    INSTALL_DIR="/usr/local/bin"
 else
-    # Fallback for Linux users without sudo access to /usr/local/bin
     INSTALL_DIR="$HOME/.local/bin"
     mkdir -p "$INSTALL_DIR"
-    USE_SUDO=false
 fi
 
 write_step "Fetching latest release from GitHub..."
@@ -76,7 +82,6 @@ else
     sudo mv "$TEMP_FILE" "$INSTALL_DIR/$APP_NAME"
 fi
 
-# Check Chrome Dependency (macOS specific)
 if [ "$OS" == "darwin" ]; then
     write_step "Checking dependencies..."
     if [ ! -d "/Applications/Google Chrome.app" ] && ! command -v google-chrome &> /dev/null; then
@@ -88,7 +93,6 @@ if [ "$OS" == "darwin" ]; then
     fi
 fi
 
-# PATH Check for non-standard locations
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     write_warning "$INSTALL_DIR is not in your PATH."
     write_warning "Please add it to your .zshrc or .bashrc:"
