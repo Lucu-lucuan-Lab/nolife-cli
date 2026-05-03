@@ -232,17 +232,16 @@ func (c *ChromeDP) EnableAdBlocking(ctx context.Context) error {
 	}
 
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
-		switch e := ev.(type) {
-		case *fetch.EventRequestPaused:
+		if e, ok := ev.(*fetch.EventRequestPaused); ok {
 			go func() {
 				url := e.Request.URL
 
 				if utils.IsAdURL(url) || c.isBlockedResource(url) {
-					_ = chromedp.Run(ctx, fetch.FailRequest(e.RequestID, network.ErrorReasonBlockedByClient))
+					_ = chromedp.Run(c.ctx, fetch.FailRequest(e.RequestID, network.ErrorReasonBlockedByClient))
 					return
 				}
 
-				_ = chromedp.Run(ctx, fetch.ContinueRequest(e.RequestID))
+				_ = chromedp.Run(c.ctx, fetch.ContinueRequest(e.RequestID))
 			}()
 		}
 	})

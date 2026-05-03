@@ -376,7 +376,6 @@ func (o *Oploverz) FetchEpisodeQualities(_ context.Context, episodeURL string) (
 						}
 					}
 				}
-				// Special case for Oploverz: GD or AKIRA are often used as shorthand for Acefile-proxied Google Drive
 				if (lowerText === 'gd' || lowerText === 'akira') {
 					return { name: 'acefile', priority: 1, supported: true };
 				}
@@ -411,13 +410,11 @@ func (o *Oploverz) FetchEpisodeQualities(_ context.Context, episodeURL string) (
 
 						rows.forEach(row => {
 							let rowText = row.textContent.trim();
-							// More flexible regex for resolution
 							let resMatch = rowText.match(/(\d{3,4}p|4k)/i);
 
 							if (resMatch) {
 								let resolution = resMatch[1];
 								
-								// Sometimes links are in the same div, sometimes in the next sibling
 								let links = row.querySelectorAll('a');
 								if (links.length === 0 && row.nextElementSibling) {
 									links = row.nextElementSibling.querySelectorAll('a');
@@ -434,7 +431,6 @@ func (o *Oploverz) FetchEpisodeQualities(_ context.Context, episodeURL string) (
 											numericRes = '2160';
 										}
 										
-										// Double check resolution from link context if it seems low/missing
 										if (numericRes === "0" || numericRes === "") {
 											let inferred = inferResolution(linkText, href);
 											if (inferred) numericRes = inferred;
