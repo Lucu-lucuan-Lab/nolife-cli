@@ -1,0 +1,24 @@
+# Go cache and test artifacts
+/.gocache/
+/coverage.out
+*.test
+
+# Build artifacts
+/nolife
+/nolife.exe
+/nolife.exe~
+/bin/
+/dist/
+
+# Runtime state and downloaded files
+/.download_state.json
+/downloads/
+
+# IDE-local files
+/.idea/dictionaries/
+/.idea/inspectionProfiles/
+
+# OS files
+.DS_Store
+Thumbs.db
+.idea

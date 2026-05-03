@@ -1,0 +1,71 @@
+browser:
+    headless: true
+    disable_gpu: true
+    disable_images: true
+    user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
+    timeout:
+        navigation: 60s
+        page_load: 30s
+        element_wait: 20s
+download:
+    skip_existing: true
+    preferred_quality: highest
+general:
+    output_dir: C:\Users\munawar\Downloads\Anime
+    log_level: info
+    max_concurrent: 10
+hosts:
+    acefile:
+        domains:
+            - acefile.co
+            - acefile.com
+            - akirabox.com
+        selectors:
+            - //*[@id="3-2-1"]
+            - //a[contains(text(), "Fast Download")]
+            - //button[contains(text(), "Fast Download")]
+            - //a[contains(text(), "Download")]
+    filedon:
+        domains:
+            - filedon.co
+        selectors:
+            - //button[contains(text(), "Download Now")]
+            - //a[contains(text(), "Download Now")]
+            - //button[contains(text(), "Download")]
+            - //a[contains(text(), "Download")]
+    googledrive:
+        domains:
+            - drive.google.com
+            - drive.usercontent.google.com
+        selectors:
+            - //a[@id="uc-download-link"]
+            - //a[contains(text(), "Download anyway")]
+            - //button[contains(text(), "Download")]
+            - //form[@id="download-form"]//button
+    mixdrop:
+        domains:
+            - mixdrop.co
+            - mixdrop.to
+            - mixdrop.ch
+            - mixdrop.sx
+            - mixdrop.bz
+            - mixdrop.gl
+            - m1xdrop.net
+        selectors:
+            - //*[@id="download-link"]
+            - //a[contains(@class, "download")]
+            - //button[contains(text(), "Download")]
+            - //a[contains(text(), "Download")]
+    pixeldrain:
+        domains:
+            - pixeldrain.com
+        selectors: []
+sites:
+    oploverz:
+        domains:
+            - vip.oploverz.ltd
+            - coba.oploverz.ltd
+            - anime1.oploverz.ac
+            - oploverz.net
+            - oploverz.ac
+        episode_pattern: episode
