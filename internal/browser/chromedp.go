@@ -231,39 +231,19 @@ func (c *ChromeDP) EnableAdBlocking(ctx context.Context) error {
 		return err
 	}
 
-	fetchJobs := make(chan *fetch.EventRequestPaused, 100)
-
-	for i := 0; i < 4; i++ {
-		go func() {
-			for {
-				select {
-				case <-ctx.Done():
-					return
-				case e := <-fetchJobs:
-					url := e.Request.URL
-					cmdCtx, cancel := context.WithTimeout(c.ctx, 2*time.Second)
-					if utils.IsAdURL(url) || c.isBlockedResource(url) {
-						_ = chromedp.Run(cmdCtx, fetch.FailRequest(e.RequestID, network.ErrorReasonBlockedByClient))
-					} else {
-						_ = chromedp.Run(cmdCtx, fetch.ContinueRequest(e.RequestID))
-					}
-					cancel()
-				}
-			}
-		}()
-	}
-
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
-		if e, ok := ev.(*fetch.EventRequestPaused); ok {
-			select {
-			case fetchJobs <- e:
-			default:
-				go func() {
-					cmdCtx, cancel := context.WithTimeout(c.ctx, 2*time.Second)
-					_ = chromedp.Run(cmdCtx, fetch.ContinueRequest(e.RequestID))
-					cancel()
-				}()
-			}
+		switch e := ev.(type) {
+		case *fetch.EventRequestPaused:
+			go func() {
+				url := e.Request.URL
+
+				if utils.IsAdURL(url) || c.isBlockedResource(url) {
+					_ = chromedp.Run(ctx, fetch.FailRequest(e.RequestID, network.ErrorReasonBlockedByClient))
+					return
+				}
+
+				_ = chromedp.Run(ctx, fetch.ContinueRequest(e.RequestID))
+			}()
 		}
 	})
 

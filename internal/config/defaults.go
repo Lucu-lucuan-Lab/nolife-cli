@@ -39,6 +39,7 @@ func DefaultConfig() *Config {
 		Sites: map[string]SiteConfig{
 			"oploverz": {
 				Domains: []string{
+					"vip.oploverz.ltd",
 					"coba.oploverz.ltd",
 					"anime1.oploverz.ac",
 					"oploverz.net",
