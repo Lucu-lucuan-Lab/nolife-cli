@@ -1,8 +1,8 @@
 $ErrorActionPreference = 'Stop'
-
+# Configuration
 $repo = "Lucu-lucuan-Lab/nolife-cli"
 $appName = "nolife"
-$installDir = Join-Path $env:LOCALAPPDATA "Programs\$appName"
+$installDir = Join-Path $env:LOCALAPPDATA "Programs\NoLife"
 $exePath = Join-Path $installDir "$appName.exe"
 $githubUrl = "https://github.com/$repo"
 $apiUrl = "https://api.github.com/repos/$repo/releases/latest"

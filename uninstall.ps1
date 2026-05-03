@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
 $appName = "nolife"
-$installDir = Join-Path $env:LOCALAPPDATA "Programs\$appName"
+$installDir = Join-Path $env:LOCALAPPDATA "Programs\NoLife"
 
 function Write-Step($msg) {
     Write-Host "`n[*] $msg" -ForegroundColor Cyan
